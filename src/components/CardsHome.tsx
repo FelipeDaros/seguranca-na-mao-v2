@@ -11,19 +11,25 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 type Props = IPressableProps & {
   name: string;
-  route: string;
+  route?: string;
   iconName: string;
 };
 
 export default function CardsHome({ name, route, iconName, ...rest }: Props) {
-  const { navigate } = useNavigation();
+  const navigation = useNavigation();
 
-  function navigateRoute(route: string) {}
+  function navigateRoute(route: string) {
+    navigation.navigate(route);
+  }
 
   return (
     <Pressable
       {...rest}
-      onPress={() => navigateRoute(route)}
+      onPress={() => {
+        if(route){
+          navigateRoute(route);
+        }
+      }}
       w="20"
       h="32"
       justifyContent="center"
