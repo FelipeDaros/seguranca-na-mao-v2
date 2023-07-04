@@ -2,6 +2,7 @@ import { Button, Modal, Text } from "native-base";
 import { useEffect, useState } from "react";
 import { IOcorrenciaProps } from "../Interfaces/IOcorrence";
 import { api } from "../../../config/api";
+import dayjs from "dayjs";
 
 type Props = {
   id: number | undefined;
@@ -29,7 +30,7 @@ export default function ModalOccurrenceSelect({ id, open, setIsClose }: Props) {
         <Modal.Header>{ocorrencia?.titulo}</Modal.Header>
         <Modal.Body>
           <Text fontFamily="mono" color="personColors.150">
-            {ocorrencia?.dataOcorrencia}
+            Data: {dayjs(ocorrencia?.dataOcorrencia).format('DD/MM/YYYY')}
           </Text>
           <Text
             fontFamily="body"
@@ -42,7 +43,7 @@ export default function ModalOccurrenceSelect({ id, open, setIsClose }: Props) {
           <Text fontFamily="mono" color="personColors.150" mt="4">
             Usuário resposável: {ocorrencia?.User.nome}
           </Text>
-          <Button
+          {/* <Button
             variant="outline"
             borderColor="personColors.50"
             w="60%"
@@ -51,7 +52,7 @@ export default function ModalOccurrenceSelect({ id, open, setIsClose }: Props) {
             <Text color="personColors.50" fontSize="xs" fontFamily="heading">
               Visualizar
             </Text>
-          </Button>
+          </Button> */}
         </Modal.Body>
       </Modal.Content>
     </Modal>

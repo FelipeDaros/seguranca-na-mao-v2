@@ -1,12 +1,14 @@
-import { Button, HStack, Text, VStack } from "native-base";
+import { Button, HStack, Text, VStack, useToast } from "native-base";
 import Header from "../../components/Header";
 import { Controller, useForm } from "react-hook-form";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from "expo-image-picker";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { api } from "../../config/api";
+import { useNavigation } from "@react-navigation/native";
 
 type FormData = {
   titulo: string;
@@ -21,15 +23,20 @@ export default function RegisterOccurrence() {
     handleSubmit,
     setValue,
     getValues,
+    watch,
+    getFieldState,
     formState: { errors },
   } = useForm<FormData>({});
+  const toast = useToast();
   const [isOpenData, setIsOpenData] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(true);
   const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
+  const navigation = useNavigation();
 
   const pickImage = async () => {
-    const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     // No permissions request is necessary for launching the image library
-    if(status === 'granted'){
+    if (status === "granted") {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: false,
@@ -37,14 +44,50 @@ export default function RegisterOccurrence() {
         aspect: [4, 3],
         quality: 1,
       });
-  
+
       if (!result.canceled) {
-        console.log(result.assets)
+        setValue("fotos", result.assets);
       }
-    }else{
+    } else {
       await ImagePicker.requestMediaLibraryPermissionsAsync();
     }
   };
+
+  async function salvarOcorrencia({data_selecionada, descricao, fotos, titulo}: FormData){
+    try {
+      await api.post('/ocorrencia', {
+        descricao,
+        titulo,
+        usuario_id: 'da88f629-8804-4dd8-9207-807a7a346765',
+        dataOcorrencia: data_selecionada
+      });
+      navigation.goBack();
+      toast.show({
+        title: "Ocorrência registrada com sucesso!",
+        duration: 3000,
+        bg: "green.400",
+        placement: "top",
+      });
+      return;
+    } catch (error) {
+      toast.show({
+        title: "Erro ao registrar ocorrência!",
+        duration: 3000,
+        bg: "error.500",
+        placement: "top",
+      });
+      return;
+    }
+  }
+  
+  useEffect(() => {
+    if(!getValues('data_selecionada') && !getValues('descricao') && !getValues('titulo')){
+      setIsDisabled(true);
+    }else{
+      setIsDisabled(false);
+    }
+    console.log(getFieldState('data_selecionada'));
+  },[])
 
   return (
     <VStack flex={1}>
@@ -57,6 +100,8 @@ export default function RegisterOccurrence() {
           control={control}
           rules={{
             maxLength: 100,
+            required: true,
+            minLength: 6
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <>
@@ -71,6 +116,7 @@ export default function RegisterOccurrence() {
               </Text>
               <CustomInput
                 bg="white"
+                borderColor={errors.titulo && 'error.500'}
                 mt="2"
                 onChangeText={onChange}
                 value={value}
@@ -79,10 +125,13 @@ export default function RegisterOccurrence() {
           )}
           name="titulo"
         />
+        {errors.titulo && <Text color={"error.500"} my="2">Campo é obrigatório</Text>}
         <Controller
           control={control}
           rules={{
             maxLength: 100,
+            required: true,
+            minLength: 6
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <>
@@ -98,6 +147,7 @@ export default function RegisterOccurrence() {
               </Text>
               <CustomInput
                 bg="white"
+                borderColor={errors.descricao && 'error.500'}
                 mt="2"
                 onChangeText={onChange}
                 value={value}
@@ -106,10 +156,12 @@ export default function RegisterOccurrence() {
           )}
           name="descricao"
         />
+        {errors.descricao && <Text color={"error.500"} my="2">Campo é obrigatório</Text>}
         <Controller
           control={control}
           rules={{
             maxLength: 100,
+            required: true,
           }}
           render={({ field: { onChange, onBlur, value } }) => (
             <>
@@ -133,7 +185,6 @@ export default function RegisterOccurrence() {
                     if (event?.type === "set" && selectedDate) {
                       onChange(selectedDate);
                     }
-                    console.log(getValues("data_selecionada"));
                   }}
                 />
               )}
@@ -141,7 +192,8 @@ export default function RegisterOccurrence() {
           )}
           name="data_selecionada"
         />
-        <Controller
+        {errors.data_selecionada && <Text color={"error.500"} my="2">Campo é obrigatório</Text>}
+        {/* <Controller
           control={control}
           rules={{
             maxLength: 100,
@@ -157,14 +209,20 @@ export default function RegisterOccurrence() {
               >
                 Adicionar Fotos
               </Text>
-              <CustomButton title="Selecionar foto" w="12" onPress={pickImage}/>
+              {value?.length && (
+                <Text color="personColors.150" fontFamily="body" my="4">
+                  Você selecionou {value?.length} fotos
+                </Text>
+              )}
+              <Button onPress={pickImage}>Selecionar foto</Button>
             </>
           )}
           name="fotos"
-        />
-        <VStack alignItems="center" justifyItems="center" mt="50%">
-          <CustomButton title="Salvar" onPress={() => {}} />
-        </VStack>
+        /> */}
+        
+      </VStack>
+      <VStack alignItems="center" justifyItems="center" position="relative" flex={1}>
+        <CustomButton title="Salvar" isDisabled={isDisabled} onPress={handleSubmit(salvarOcorrencia)} />
       </VStack>
     </VStack>
   );

@@ -17,6 +17,10 @@ import CustomInput from "../../components/CustomInput";
 import { useEffect, useState } from "react";
 import { api } from "../../config/api";
 import CustomButton from "../../components/CustomButton";
+import { useAuth } from "../../contexts/AuthContext";
+import { UserType } from "../../contexts/UserType";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 type FormData = {
   nome: string;
@@ -45,6 +49,9 @@ export default function PostService() {
     formState: { errors },
   } = useForm<FormData>({});
   const toast = useToast();
+  const { usuario } = useAuth();
+  const navigation = useNavigation();
+
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [empresas, setEmpresas] = useState<EmpresaProps[]>([]);
@@ -55,8 +62,27 @@ export default function PostService() {
   >([]);
 
   async function buscarEquipamentos() {
-    const { data } = await api.get("/equipamentos");
-    setEquipaments(data);
+    try {
+      const user: UserType = JSON.parse(usuario);
+      const { data } = await api.get("/equipamentos", {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      setEquipaments(data);
+    } catch (error) {
+      if (error.response.status === 401) {
+        await AsyncStorage.removeItem("usuario");
+        navigation.navigate("Login");
+      }
+
+      toast.show({
+        title: "Erro ao listar!",
+        duration: 3000,
+        bg: "error.500",
+        placement: "top",
+      });
+    }
   }
 
   async function selecionarEquipamentos(id: number) {
@@ -85,9 +111,9 @@ export default function PostService() {
   }
 
   async function handleSave(data: FormData) {
-    setIsLoading(true)
-
-    if(!data.equipaments?.length || !data.equipaments){
+    setIsLoading(true);
+    const user: UserType = JSON.parse(usuario);
+    if (!data.equipaments?.length || !data.equipaments) {
       toast.show({
         title: "Informe pelo menos um equipamento",
         duration: 3000,
@@ -99,11 +125,19 @@ export default function PostService() {
     }
 
     try {
-      await api.post("/posto-servico", {
-        nome: data.nome,
-        empresa_id: data.empresa_id,
-        equipaments: data.equipaments,
-      });
+      await api.post(
+        "/posto-servico",
+        {
+          nome: data.nome,
+          empresa_id: data.empresa_id,
+          equipaments: data.equipaments,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
       setEmpresaSelecionada(null);
       setEquipamentosSelecionados([]);
       reset();
@@ -113,28 +147,32 @@ export default function PostService() {
         bg: "green.400",
         placement: "top",
       });
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response.status === 401) {
+        await AsyncStorage.removeItem("usuario");
+        navigation.navigate("Login");
+      }
+
       toast.show({
         title: "Erro ao cadastrar o posto",
         duration: 3000,
         bg: "red.400",
         placement: "top",
       });
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   }
 
   useEffect(() => {
     buscarEquipamentos();
-
     if (isOpen) {
       buscarEmpresas();
     }
   }, [isOpen]);
 
   return (
-    <VStack>
+    <VStack flex={1}>
       <Header back />
       <VStack alignItems="center" justifyItems="center" mt="4">
         <Text fontFamily="mono" color="personColors.150" fontSize="lg">
@@ -145,7 +183,7 @@ export default function PostService() {
             control={control}
             rules={{
               maxLength: 100,
-              required: true
+              required: true,
             }}
             render={({ field: { onChange, onBlur, value } }) => (
               <>
@@ -232,13 +270,18 @@ export default function PostService() {
           </VStack>
         </VStack>
       </VStack>
-      <Box alignItems="center" justifyItems="center" mt="16">
+      <VStack
+        alignItems="center"
+        justifyItems="center"
+        position="relative"
+        flex={1}
+      >
         <CustomButton
           title="Salvar"
-          onPress={handleSubmit(handleSave)}
           isLoading={isLoading}
+          onPress={handleSubmit(handleSave)}
         />
-      </Box>
+      </VStack>
 
       <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
         <Modal.Content maxWidth="400px">

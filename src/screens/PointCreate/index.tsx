@@ -71,7 +71,7 @@ export default function PointCreate() {
   }, []);
 
   return (
-    <VStack>
+    <VStack flex={1}>
       <Header back />
       <VStack alignItems="center" justifyItems="center" mt="4">
         <Text color="personColors.150" fontFamily="mono" fontSize="lg">
@@ -113,9 +113,14 @@ export default function PointCreate() {
           <Text fontFamily="mono">Geolocalização</Text>
           <Progress value={progress} mx="4" w="64" mt="4" />
         </VStack>
-        <VStack alignItems="center" justifyItems="center" mt="40%">
-          <CustomButton title="Salvar" onPress={handleSubmit(handleSave)} />
-        </VStack>
+      </VStack>
+      <VStack
+        alignItems="center"
+        justifyItems="center"
+        position="relative"
+        flex={1}
+      >
+        <CustomButton title="Salvar" onPress={handleSubmit(handleSave)} />
       </VStack>
     </VStack>
   );

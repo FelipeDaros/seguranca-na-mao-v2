@@ -39,13 +39,13 @@ export default function Home() {
     <VStack>
       <Header />
       <VStack alignItems="center" justifyContent="center" mt="32">
-        <Text fontFamily="heading" color="personColors.150" mb="4">
+        <Text fontFamily="heading" fontSize="lg" color="personColors.150" mb="4">
           Utilitários
         </Text>
         <HStack>
           <CardsHome
             name="Rondas"
-            route="ronda"
+            route="Round"
             iconName="alert-circle-outline"
           />
           <CardsHome name="Alert" route="alert" iconName="bell-outline" />
@@ -55,7 +55,7 @@ export default function Home() {
             onLongPress={panico}
           />
         </HStack>
-        <Text fontFamily="heading" color="personColors.150" mb="4" mt="4">
+        <Text fontFamily="heading" fontSize="lg" color="personColors.150" mb="4" mt="4">
           Cadastros
         </Text>
 
