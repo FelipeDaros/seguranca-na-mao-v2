@@ -7,33 +7,31 @@ import { IOcorrenciaProps } from "./Interfaces/IOcorrence";
 import ModalOccurrenceSelect from "./Components/ModalOccurrenceSelect";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../contexts/AuthContext";
-import { UserType } from "../../contexts/UserType";
-import { AxiosError } from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Occurrence() {
   const navigation = useNavigation();
   const [ocorrencias, setOcorrencias] = useState<IOcorrenciaProps[]>([]);
   const [ocorrenciaSelecionada, setOcorrenciaSelecionada] = useState<number>();
   const [isOpen, setIsOpen] = useState(false);
-  const { usuario } = useAuth();
+  const { user, signOut } = useAuth();
   const toast = useToast();
 
   async function buscarOccorrencias() {
     try {
-      const user: UserType = JSON.parse(usuario);
-      const { data } = await api.get("/ocorrencia", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
+      const { data } = await api.get("/ocorrencia");
       setOcorrencias(data);
     } catch (error: any) {
+      console.log(error);
       if (error.response.status === 401) {
-        await AsyncStorage.removeItem("usuario");
-        navigation.navigate("Login");
+        signOut();
+        toast.show({
+          title: "Você precisa efetuar o login!",
+          duration: 3000,
+          bg: "error.500",
+          placement: "top",
+        });
+        return;
       }
-      
       toast.show({
         title: "Erro ao listar!",
         duration: 3000,

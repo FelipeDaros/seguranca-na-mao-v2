@@ -49,7 +49,7 @@ export default function PostService() {
     formState: { errors },
   } = useForm<FormData>({});
   const toast = useToast();
-  const { usuario } = useAuth();
+  const { signOut, user } = useAuth();
   const navigation = useNavigation();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -63,17 +63,18 @@ export default function PostService() {
 
   async function buscarEquipamentos() {
     try {
-      const user: UserType = JSON.parse(usuario);
-      const { data } = await api.get("/equipamentos", {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
+      const { data } = await api.get("/equipamentos");
       setEquipaments(data);
     } catch (error) {
       if (error.response.status === 401) {
-        await AsyncStorage.removeItem("usuario");
-        navigation.navigate("Login");
+        signOut();
+        toast.show({
+          title: "Você precisa efetuar o login!",
+          duration: 3000,
+          bg: "error.500",
+          placement: "top",
+        });
+        return;
       }
 
       toast.show({

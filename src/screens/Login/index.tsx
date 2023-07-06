@@ -3,14 +3,12 @@ import CustomInput from "../../components/CustomInput";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CustomButton from "../../components/CustomButton";
 import { Controller, useForm } from "react-hook-form";
-import { api } from "../../config/api";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import { Alert } from "react-native";
-
+import { useAuth } from "../../contexts/AuthContext";
+ 
 export default function Login() {
   const toast = useToast();
-  const navigation = useNavigation();
+  const {signIn} = useAuth();
 
   const {
     control,
@@ -25,18 +23,13 @@ export default function Login() {
 
   async function login(form: any) {
     try {
-      const { data } = await api.post("/auth", {
-        nome: form.nome,
-        senha: form.senha,
-      });
-      await AsyncStorage.setItem("usuario", JSON.stringify(data));
+      await signIn(form.nome, form.senha)
       toast.show({
         title: "Login efetuado com sucesso!",
         duration: 3000,
         bg: "green.500",
         placement: "top",
       });
-      navigation.navigate("Home");
       return;
     } catch (error) {
       toast.show({

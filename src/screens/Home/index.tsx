@@ -1,8 +1,9 @@
-import { Center, HStack, ScrollView, Text, VStack, useToast } from "native-base";
+import { Button, Center, HStack, ScrollView, Text, VStack, useToast } from "native-base";
 import Header from "../../components/Header";
 import CardsHome from "../../components/CardsHome";
 import { api } from "../../config/api";
 import { useEffect, useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Home() {
   const toast = useToast();
@@ -58,7 +59,6 @@ export default function Home() {
         <Text fontFamily="heading" fontSize="lg" color="personColors.150" mb="4" mt="4">
           Cadastros
         </Text>
-
         <Center>
           <ScrollView
             horizontal={true}

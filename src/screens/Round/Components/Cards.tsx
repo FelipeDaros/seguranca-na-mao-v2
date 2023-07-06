@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 export function Cards(props:any){
   console.log(props)
   return(
-    <HStack mt="4" alignItems="center" justifyContent="center" w="3/6" alignSelf="center">
+    <HStack mt="8" alignItems="center" justifyContent="center" w="3/5" alignSelf="center">
       <Box bg="personColors.100" h="12" w="12" rounded="full" justifyContent="center" alignItems="center">
       <Icon
             size={8}
