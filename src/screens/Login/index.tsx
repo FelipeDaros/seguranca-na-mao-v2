@@ -5,10 +5,12 @@ import CustomButton from "../../components/CustomButton";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../contexts/AuthContext";
- 
+import { useState } from "react";
+
 export default function Login() {
   const toast = useToast();
-  const {signIn} = useAuth();
+  const { signIn } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const {
     control,
@@ -22,8 +24,9 @@ export default function Login() {
   });
 
   async function login(form: any) {
+    setLoading(true);
     try {
-      await signIn(form.nome, form.senha)
+      await signIn(form.nome, form.senha);
       toast.show({
         title: "Login efetuado com sucesso!",
         duration: 3000,
@@ -39,6 +42,8 @@ export default function Login() {
         placement: "top",
       });
       return;
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -62,14 +67,13 @@ export default function Login() {
             <CustomInput
               placeholder="informe seu usuário"
               onChangeText={(text) => onChange(text)}
-              borderColor={errors.nome && 'error.500'}
-              borderWidth={errors.nome && '1'}
+              borderColor={errors.nome && "error.500"}
+              borderWidth={errors.nome && "1"}
               InputLeftElement={
                 <Icon
                   ml="2"
                   size="md"
                   as={MaterialCommunityIcons}
-                  
                   position="absolute"
                   color="personColors.150"
                   name="account"
@@ -82,7 +86,11 @@ export default function Login() {
           )}
           name="nome"
         />
-        {errors.nome && <Text color={"error.500"} fontSize={10} mb="2">Campo é obrigatório</Text>}
+        {errors.nome && (
+          <Text color={"error.500"} fontSize={10} mb="2">
+            Campo é obrigatório
+          </Text>
+        )}
         <Controller
           control={control}
           rules={{
@@ -92,8 +100,8 @@ export default function Login() {
             <CustomInput
               placeholder="Insira sua senha"
               onChangeText={(text) => onChange(text)}
-              borderColor={errors.senha && 'error.500'}
-              borderWidth={errors.senha && '1'}
+              borderColor={errors.senha && "error.500"}
+              borderWidth={errors.senha && "1"}
               InputRightElement={
                 <Icon
                   ml="2"
@@ -112,7 +120,11 @@ export default function Login() {
           )}
           name="senha"
         />
-        {errors.senha && <Text color={"error.500"} fontSize={10} mb="2">Campo é obrigatório</Text>}
+        {errors.senha && (
+          <Text color={"error.500"} fontSize={10} mb="2">
+            Campo é obrigatório
+          </Text>
+        )}
       </VStack>
       <VStack
         alignItems="center"
@@ -120,7 +132,11 @@ export default function Login() {
         position="relative"
         flex={1}
       >
-        <CustomButton title="Entrar" onPress={handleSubmit(login)} />
+        <CustomButton
+          title="Entrar"
+          isLoading={loading}
+          onPress={handleSubmit(login)}
+        />
       </VStack>
     </VStack>
   );

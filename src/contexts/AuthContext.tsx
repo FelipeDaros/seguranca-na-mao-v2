@@ -1,9 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { api } from "../config/api";
+import { IUsuario } from "../interfaces/IUsuario";
 
 type AuthContextDataProps = {
-  user: object | null;
+  user: IUsuario | null;
   checked: boolean;
   signIn(nome: string, senha: string): Promise<void>;
   signOut(): Promise<void>;

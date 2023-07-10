@@ -1,6 +1,7 @@
 import { Avatar, HStack, Icon, Pressable, Text, VStack } from "native-base";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { useAuth } from "../contexts/AuthContext";
 
 type Props = {
   back?: boolean;
@@ -8,6 +9,7 @@ type Props = {
 
 export default function Header({ back }: Props) {
   const navigation = useNavigation();
+  const { user } = useAuth();
 
   return (
     <VStack h="24">
@@ -30,7 +32,7 @@ export default function Header({ back }: Props) {
         )}
         <HStack alignItems="center">
           <Text color="personColors.150" mr="6" fontFamily="mono">
-            Olá Felipe
+            {user?.user.nome}
           </Text>
           <Avatar />
         </HStack>

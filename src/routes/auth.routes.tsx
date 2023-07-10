@@ -10,6 +10,7 @@ import RegisterOccurrence from "../screens/Occurrence/Register";
 import { Round } from "../screens/Round";
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect } from "react";
+import { RoundSelected } from "../screens/Round/Components/RoundSelected";
 
 export function AuthRoutes() {
   const { Screen, Navigator } = createNativeStackNavigator();
@@ -27,6 +28,7 @@ export function AuthRoutes() {
       <Screen name="Occurrence" component={Occurrence} />
       <Screen name="RegisterOccurrence" component={RegisterOccurrence} />
       <Screen name="Round" component={Round} />
+      <Screen name="RoundSelected" component={RoundSelected} />
     </Navigator>
   );
 }

@@ -1,4 +1,12 @@
-import { Button, Center, HStack, ScrollView, Text, VStack, useToast } from "native-base";
+import {
+  Button,
+  Center,
+  HStack,
+  ScrollView,
+  Text,
+  VStack,
+  useToast,
+} from "native-base";
 import Header from "../../components/Header";
 import CardsHome from "../../components/CardsHome";
 import { api } from "../../config/api";
@@ -8,6 +16,7 @@ import { useAuth } from "../../contexts/AuthContext";
 export default function Home() {
   const toast = useToast();
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
   async function panico() {
     setLoading(true);
@@ -29,18 +38,23 @@ export default function Home() {
         bg: "error.500",
         placement: "top",
       });
-    }finally{
+    } finally {
       setLoading(false);
     }
   }
 
-  async function alert(){}
+  async function alert() {}
 
   return (
     <VStack>
       <Header />
       <VStack alignItems="center" justifyContent="center" mt="32">
-        <Text fontFamily="heading" fontSize="lg" color="personColors.150" mb="4">
+        <Text
+          fontFamily="heading"
+          fontSize="lg"
+          color="personColors.150"
+          mb="4"
+        >
           Utilitários
         </Text>
         <HStack>
@@ -56,7 +70,13 @@ export default function Home() {
             onLongPress={panico}
           />
         </HStack>
-        <Text fontFamily="heading" fontSize="lg" color="personColors.150" mb="4" mt="4">
+        <Text
+          fontFamily="heading"
+          fontSize="lg"
+          color="personColors.150"
+          mb="4"
+          mt="4"
+        >
           Cadastros
         </Text>
         <Center>
@@ -65,24 +85,28 @@ export default function Home() {
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
           >
-            <CardsHome
-              name="Cadastrar ponto"
-              route="PointCreate"
-              iconName="map-marker-plus-outline"
-              pt="2"
-            />
-            <CardsHome
-              name="Cadastrar Equipamento"
-              route="EquipamentCreate"
-              iconName="plus-minus"
-              pt="2"
-            />
-            <CardsHome
-              name="Cadastrar Posto"
-              route="PostService"
-              iconName="warehouse"
-              pt="2"
-            />
+            {user?.user.isAdmin && (
+              <>
+                <CardsHome
+                  name="Cadastrar ponto"
+                  route="PointCreate"
+                  iconName="map-marker-plus-outline"
+                  pt="2"
+                />
+                <CardsHome
+                  name="Cadastrar Equipamento"
+                  route="EquipamentCreate"
+                  iconName="plus-minus"
+                  pt="2"
+                />
+                <CardsHome
+                  name="Cadastrar Posto"
+                  route="PostService"
+                  iconName="warehouse"
+                  pt="2"
+                />
+              </>
+            )}
             <CardsHome
               name="Ocorrências"
               route="Occurrence"
